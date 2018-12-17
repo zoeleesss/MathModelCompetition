@@ -24,7 +24,7 @@ def deSerialize(filename):
 
 
 # 加载csv文件，并返回数据 data, m 是数据行数
-def loadCSVfilePredict(filename,encoding='gbk'):
+def loadCSVfilePredict(filename,encoding='utf8'):
     data = []
     label = []
     m = 0
@@ -42,7 +42,7 @@ def loadCSVfilePredict(filename,encoding='gbk'):
     return [data, label, m]
 
 # 加载csv文件，并返回数据 data, m 是数据行数
-def loadCSVfile(filename,encoding='gbk'):
+def loadCSVfile(filename,encoding='utf8'):
     data = []
     label = []
     m = 0
@@ -90,7 +90,7 @@ def add_partner_info(data, filename):
 
 # 增加一个维度： 股东的数量
 def add_question_partner_info(data, filename):
-    [p_data,p_label,p_m] = loadCSVfile(filename,'gbk')
+    [p_data,p_label,p_m] = loadCSVfile(filename,'utf8')
     for i in range(0,len(data)):
         data[i].append(0)
 
@@ -104,7 +104,7 @@ def add_question_partner_info(data, filename):
 
 # 增加 3 维度： 专利的数量
 def add_patent_info(data, filename):
-    [p_data, p_label, p_m] = loadCSVfile(filename)
+    [p_data, p_label, p_m] = loadCSVfile(filename,'utf8')
     for i in range(0, len(data)):
         # 每一行增加3 个维度： 不同种类的专利数量
         data[i].append(0)   # -3
@@ -133,7 +133,7 @@ def add_question_patent_info(data, filename):
 
 # 增加 4 维度： 历史的各类投资的数量
 def add_invest_info(data, filename):
-    [p_data, p_label, p_m] = loadCSVfile(filename)
+    [p_data, p_label, p_m] = loadCSVfile(filename,'utf8')
     for i in range(0, len(data)):
         # 每一行增加3 个维度： 不同种类的投资数量
         data[i].append(0)  # -4
@@ -143,8 +143,8 @@ def add_invest_info(data, filename):
 
     for d in p_data:
         enterprise_id = d[0]
-        # NOTE : 此处的invest 表是在删除invest_name 后处理的 -- 防止编码错误
-        invest_level = d[3]
+        # NOTE : 此处的invest 表是在删除invest_name 后处理的 -- 防止编码错误      ok
+        invest_level = d[4]
         try:
             int_id = enterprise_id_mapping[enterprise_id]
             invest_time = d[2]
@@ -198,7 +198,7 @@ def add_judgement_info(data, filename):
     p_data = []
     m = 0
     isfirst = 1
-    csv_file = csv.reader(open(filename, 'r', encoding='gbk'))
+    csv_file = csv.reader(open(filename, 'r', encoding='utf8'))
     for line in csv_file:
         if (isfirst == 1):
             isfirst = 0
@@ -217,8 +217,8 @@ def add_judgement_info(data, filename):
 
     for d in p_data:
         enterprise_id = d[0]
-        # NOTE : 此处的judgement 表是在删除judgement_name 后处理的 -- 防止编码错误
-        judgement_type = d[2]
+        # NOTE : 此处的judgement 表是在删除judgement_name 后处理的 -- 防止编码错误    ok
+        judgement_type = d[3]
         try:
             int_id = enterprise_id_mapping[enterprise_id]
             if judgement_type == '1':
@@ -242,7 +242,7 @@ def add_question_judgement_info(data, filename):
     p_data = []
     m = 0
     isfirst = 1
-    csv_file = csv.reader(open(filename, 'r', encoding='gbk'))
+    csv_file = csv.reader(open(filename, 'r', encoding='utf8'))
     for line in csv_file:
         if (isfirst == 1):
             isfirst = 0
@@ -334,7 +334,7 @@ def processTrainingData():
     industry_code_mapping = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8, 'I': 9, 'J': 10, 'K': 11,
                              'L': 12,'M': 13, 'N': 14, 'O': 15, 'P': 16, 'Q': 17, 'R': 18, 'S': 19, 'null': 20}
 
-    [data,label, m] = loadCSVfile('data/train/enterprise.csv')
+    [data,label, m] = loadCSVfile('data/train/enterprise.csv','utf8')
     per_line = ['tag1','tag2','tag3','tag4']
     label[0] += per_line
     col = 0
@@ -414,7 +414,7 @@ def processPredictData():
     industry_code_mapping = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8, 'I': 9, 'J': 10, 'K': 11,
                              'L': 12, 'M': 13, 'N': 14, 'O': 15, 'P': 16, 'Q': 17, 'R': 18, 'S': 19, 'null': 20}
 
-    [data, label, m] = loadCSVfilePredict('data/question/enterprise.csv')
+    [data, label, m] = loadCSVfilePredict('data/question/enterprise.csv','utf8')
     per_line = ['tag1', 'tag2', 'tag3', 'tag4']
     label[0] += per_line
     col = 0

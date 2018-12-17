@@ -8,7 +8,7 @@ from sklearn import preprocessing
 import pickle
 
 # 加载之前处理后的数据 ，并返回数据 data, m 是数据行数
-def loadProcessedCSVfile(filename,encoding='gbk'):
+def loadProcessedCSVfile(filename,encoding='utf8'):
     data = []
     m = 0
     csv_file = csv.reader(open(filename,'r',encoding=encoding))
@@ -152,7 +152,7 @@ def run_main():
     lamada = 0.001
     batch_size = 64
     learn_rate = 0.001
-    epoch = 100
+    epoch = 5
     iteration = 10000
 
     # 训练并测试网络
@@ -168,8 +168,8 @@ def run_main():
     result = bpnn.predict(predict_data)
     res = []
     index = 0
-    w_count = 3997
-    count = 7982
+    w_count = 7846
+    count = 48171
     result_count = 0.0
     print(predict_data[1])
 
@@ -208,7 +208,7 @@ def run_main():
     # 对于question 数据进行处理，并预测
     question_data = []
     isfirst = 1
-    csv_file = csv.reader(open('data/question/enterprise.csv', 'r',encoding='gbk'))
+    csv_file = csv.reader(open('data/question/enterprise.csv', 'r',encoding='utf8'))
     for line in csv_file:
         if (isfirst == 1):
             isfirst = 0
@@ -246,7 +246,7 @@ def run_main():
         per_answer.append(ent_id)
         per_answer.append(per_probability)
         question_answer.append(per_answer)
-        print('ent id ',ent_id,' and result ',per_probability)
+        #print('ent id ',ent_id,' and result ',per_probability)
 
     # 将结果保存
     saveCSVfile(question_answer, 'answer.csv')
