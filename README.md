@@ -26,8 +26,24 @@
 - 先运行 `process.py` 文件，可以得到 `all.csv` `all_question.csv` `id_mapping.binary`
 - 后运行 `bpnn.py` 文件，可以得到 `answer.csv` 
 
-## Note
-- 部分文件由于编码格式的原因，因此手工删除了部分列。
+## Input Params `45`
+
+- Enterprise:   `29 PARAMS`
+    - Tag `4 params` 
+    - Registered time   `1 param`
+    - Industry code     `20 params`
+    - Product           `1 param`
+    - Address           `3 params`
+- Partner:      `3 PARAMS`
+    - 个人股东的数量  &nbsp;&nbsp;&nbsp;  `1`
+    - 普通企业股东数量  `1`
+    - 投资机构股东数量  `1`
+- Patent:       `3 PARAMS`
+    - 历史的3类专利的数量   `3`
+- Invest:       `4 PARAMS`
+    - 历史的4类投资的数量 `4`
+- Judgement:    `6 PARAMS`
+    - 历史的6类判决的数量
 
 ## Credit
 - `Data Ultimate 战队`

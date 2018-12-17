@@ -23,6 +23,7 @@ def deSerialize(filename):
     return obj
 
 
+
 # 加载csv文件，并返回数据 data, m 是数据行数
 def loadCSVfilePredict(filename,encoding='utf8'):
     data = []
@@ -161,7 +162,6 @@ def add_invest_info(data, filename):
 
     for d in p_data:
         enterprise_id = d[0]
-        # NOTE : 此处的invest 表是在删除invest_name 后处理的 -- 防止编码错误      ok
         invest_level = d[4]
         try:
             int_id = enterprise_id_mapping[enterprise_id]
@@ -192,7 +192,6 @@ def add_question_invest_info(data, filename):
 
     for d in p_data:
         enterprise_id = d[0]
-        # NOTE : 此处的invest 表是没有删除 invest_name 列
         invest_level = d[4]
         try:
             int_id = enterprise_id_mapping[enterprise_id]
@@ -235,7 +234,6 @@ def add_judgement_info(data, filename):
 
     for d in p_data:
         enterprise_id = d[0]
-        # NOTE : 此处的judgement 表是在删除judgement_name 后处理的 -- 防止编码错误    ok
         judgement_type = d[3]
         try:
             int_id = enterprise_id_mapping[enterprise_id]
@@ -279,7 +277,6 @@ def add_question_judgement_info(data, filename):
 
     for d in p_data:
         enterprise_id = d[0]
-        # NOTE : 此处的judgement 表是 没有 删除judgement_name 列
         judgement_type = d[3]
         try:
             int_id = enterprise_id_mapping[enterprise_id]
@@ -549,7 +546,7 @@ def processPredictData():
 
     # 打印列的数量,以第一行为例
     print(len(data[0, :]))
-    print(data[2,:])
+    print(data[2, :])
 
     # 保存有用的信息
     saveCSVfile(data, "all_question.csv")
