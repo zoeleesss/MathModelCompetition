@@ -149,10 +149,10 @@ def run_main():
     output_n = np.shape(Label)[1]
     # hidden_n = int(np.sqrt(input_n*output_n))
     hidden_n = input_n
-    lamada = 0.001
+    lamada = 0.0001
     batch_size = 64
-    learn_rate = 0.001
-    epoch = 5
+    learn_rate = 0.1
+    epoch = 30
     iteration = 10000
 
     # 训练并测试网络

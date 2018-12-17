@@ -74,31 +74,49 @@ def trans(m):
             a[j].append(i[j])
     return a
 
-# 增加一个维度： 股东的数量
+
+# 增加 3 维度： 个人股东的数量, 普通企业股东数量，投资机构股东数量
 def add_partner_info(data, filename):
     [p_data,p_label,p_m] = loadCSVfile(filename,'utf8')
     for i in range(0,len(data)):
         data[i].append(0)
-
-    for d in p_data:
-        enterprise_id = d[0]
-        try:
-            int_id = enterprise_id_mapping[enterprise_id]
-            data[int_id][-1] += 1
-        except:
-            continue
-
-# 增加一个维度： 股东的数量
-def add_question_partner_info(data, filename):
-    [p_data,p_label,p_m] = loadCSVfile(filename,'utf8')
-    for i in range(0,len(data)):
+        data[i].append(0)
         data[i].append(0)
 
     for d in p_data:
         enterprise_id = d[0]
+        partner_type = d[2]
         try:
             int_id = enterprise_id_mapping[enterprise_id]
-            data[int_id][-1] += 1
+            if partner_type == '1':
+                data[int_id][-3] += 1
+            elif partner_type == '2':
+                data[int_id][-2] += 1
+            elif partner_type == '3':
+                data[int_id][-1] += 1
+        except:
+            continue
+
+
+# 增加 3 维度： 个人股东的数量, 普通企业股东数量，投资机构股东数量
+def add_question_partner_info(data, filename):
+    [p_data,p_label,p_m] = loadCSVfile(filename,'utf8')
+    for i in range(0,len(data)):
+        data[i].append(0)
+        data[i].append(0)
+        data[i].append(0)
+
+    for d in p_data:
+        enterprise_id = d[0]
+        partner_type = d[2]
+        try:
+            int_id = enterprise_id_mapping[enterprise_id]
+            if partner_type == '1':
+                data[int_id][-3] += 1
+            elif partner_type == '2':
+                data[int_id][-2] += 1
+            elif partner_type == '3':
+                data[int_id][-1] += 1
         except:
             continue
 
@@ -148,16 +166,16 @@ def add_invest_info(data, filename):
         try:
             int_id = enterprise_id_mapping[enterprise_id]
             invest_time = d[2]
-            # isValidInvestment = getTimeStampIntervalFromAToB(invest_time, '2010/6/30')
-            # if isValidInvestment > 0:
-            if invest_level == '1':
-                data[int_id][-4] += 1
-            elif invest_level == '2':
-                data[int_id][-3] += 1
-            elif invest_level == '3':
-                data[int_id][-2] += 1
-            elif invest_level == '4':
-                data[int_id][-1] += 1
+            isValidInvestment = getTimeStampIntervalFromAToB(invest_time, '2010/6/30')
+            if isValidInvestment > 0:
+                if invest_level == '1':
+                    data[int_id][-4] += 1
+                elif invest_level == '2':
+                    data[int_id][-3] += 1
+                elif invest_level == '3':
+                    data[int_id][-2] += 1
+                elif invest_level == '4':
+                    data[int_id][-1] += 1
         except:
             continue
 
@@ -179,16 +197,16 @@ def add_question_invest_info(data, filename):
         try:
             int_id = enterprise_id_mapping[enterprise_id]
             invest_time = d[2]
-            # isValidInvestment = getTimeStampIntervalFromAToB(invest_time, '2010/6/30')
-            # if isValidInvestment > 0:
-            if invest_level == '1':
-                data[int_id][-4] += 1
-            elif invest_level == '2':
-                data[int_id][-3] += 1
-            elif invest_level == '3':
-                data[int_id][-2] += 1
-            elif invest_level == '4':
-                data[int_id][-1] += 1
+            isValidInvestment = getTimeStampIntervalFromAToB(invest_time, '2010/6/30')
+            if isValidInvestment > 0:
+                if invest_level == '1':
+                    data[int_id][-4] += 1
+                elif invest_level == '2':
+                    data[int_id][-3] += 1
+                elif invest_level == '3':
+                    data[int_id][-2] += 1
+                elif invest_level == '4':
+                    data[int_id][-1] += 1
         except:
             continue
 
@@ -372,6 +390,30 @@ def processTrainingData():
         # weight = getKeywordWeight(keyword)
         # per_line[-1] = weight
 
+        # 增加产品有无介绍 1 维度
+        per_line.append(0)
+        productDesc = data[i][6]
+        if productDesc!='':
+            per_line[-1] += 1
+
+        # 增加 地区， 市区/县级/村级
+        per_line.append(0)
+        per_line.append(0)
+        per_line.append(0)
+        address = data[i][4]
+        if "村" in address:
+            per_line[-1] += 1
+        elif "县" in address:
+            per_line[-2] += 1
+        elif "市" in address:
+            per_line[-3] += 1
+
+        # 增加企业员工 1 维度
+        # employees_num = data[i][8]
+        # if employees_num == '':
+        #     employees_num = 0
+        # per_line.append(employees_num)
+
         # 添加到每一行的数据项中
         data[i] += per_line
         enterprise_id_mapping[data[i][0]] = col
@@ -452,6 +494,30 @@ def processPredictData():
         # weight = getKeywordWeight(keyword)
         # per_line[-1] = weight
 
+        # 增加产品有无介绍 1 维度
+        per_line.append(0)
+        productDesc = data[i][5]
+        if productDesc != '':
+            per_line[-1] += 1
+
+        # 增加 地区， 市区/县级/村级
+        per_line.append(0)
+        per_line.append(0)
+        per_line.append(0)
+        address = data[i][3]
+        if "村" in address:
+            per_line[-1] += 1
+        elif "县" in address:
+            per_line[-2] += 1
+        elif "市" in address:
+            per_line[-3] += 1
+
+        # 增加企业员工 1 维度
+        # employees_num = data[i][7]
+        # if employees_num == '':
+        #     employees_num = 0
+        # per_line.append(employees_num)
+
         # 添加到每一行的数据项中
         data[i] += per_line
         enterprise_id_mapping[data[i][0]] = col
@@ -470,7 +536,6 @@ def processPredictData():
 
     # 使用judgement 表信息
     add_question_judgement_info(data, 'data/question/judgement.csv')
-
 
     m = np.array(data)  # 转换为numpy.array
 
