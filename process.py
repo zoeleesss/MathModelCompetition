@@ -1,3 +1,4 @@
+#encoding=utf8
 import csv
 import numpy as np
 import time
@@ -12,6 +13,11 @@ enterprise_str_mapping_predict = {}
 # 保存 industry_code  'Char' => 'int' 映射关系
 industry_code_mapping = {}
 
+village_exceptions = ["幸福村","中关村","天使村","西柳村",'天马村','工业村']
+
+developedCities = ["北京","上海","深圳",'广州']
+
+productKeywords = []
 
 def serialize(obj, filename):
     with open(filename, 'wb') as f:
@@ -25,12 +31,12 @@ def deSerialize(filename):
 
 
 # 加载csv文件，并返回数据 data, m 是数据行数
-def loadCSVfilePredict(filename,encoding='utf8'):
+def loadCSVfilePredict(filename,encoding='gbk'):
     data = []
     label = []
     m = 0
     isfirst = 1
-    csv_file = csv.reader(open(filename,'r',encoding=encoding))
+    csv_file = csv.reader(open(filename,'r',encoding=encoding,errors="ignore"))
     for line in csv_file:
         if (isfirst == 1):
             label.append(line)
@@ -43,12 +49,12 @@ def loadCSVfilePredict(filename,encoding='utf8'):
     return [data, label, m]
 
 # 加载csv文件，并返回数据 data, m 是数据行数
-def loadCSVfile(filename,encoding='utf8'):
+def loadCSVfile(filename,encoding='gbk'):
     data = []
     label = []
     m = 0
     isfirst = 1
-    csv_file = csv.reader(open(filename,'r',encoding=encoding))
+    csv_file = csv.reader(open(filename,'r',encoding=encoding,errors="ignore"))
     for line in csv_file:
         if (isfirst == 1):
             label.append(line)
@@ -78,7 +84,7 @@ def trans(m):
 
 # 增加 3 维度： 个人股东的数量, 普通企业股东数量，投资机构股东数量
 def add_partner_info(data, filename):
-    [p_data,p_label,p_m] = loadCSVfile(filename,'utf8')
+    [p_data,p_label,p_m] = loadCSVfile(filename,'gbk')
     for i in range(0,len(data)):
         data[i].append(0)
         data[i].append(0)
@@ -101,7 +107,7 @@ def add_partner_info(data, filename):
 
 # 增加 3 维度： 个人股东的数量, 普通企业股东数量，投资机构股东数量
 def add_question_partner_info(data, filename):
-    [p_data,p_label,p_m] = loadCSVfile(filename,'utf8')
+    [p_data,p_label,p_m] = loadCSVfile(filename,'gbk')
     for i in range(0,len(data)):
         data[i].append(0)
         data[i].append(0)
@@ -123,7 +129,7 @@ def add_question_partner_info(data, filename):
 
 # 增加 3 维度： 专利的数量
 def add_patent_info(data, filename):
-    [p_data, p_label, p_m] = loadCSVfile(filename,'utf8')
+    [p_data, p_label, p_m] = loadCSVfile(filename,'gbk')
     for i in range(0, len(data)):
         # 每一行增加3 个维度： 不同种类的专利数量
         data[i].append(0)   # -3
@@ -152,7 +158,7 @@ def add_question_patent_info(data, filename):
 
 # 增加 4 维度： 历史的各类投资的数量
 def add_invest_info(data, filename):
-    [p_data, p_label, p_m] = loadCSVfile(filename,'utf8')
+    [p_data, p_label, p_m] = loadCSVfile(filename,'gbk')
     for i in range(0, len(data)):
         # 每一行增加3 个维度： 不同种类的投资数量
         data[i].append(0)  # -4
@@ -215,7 +221,7 @@ def add_judgement_info(data, filename):
     p_data = []
     m = 0
     isfirst = 1
-    csv_file = csv.reader(open(filename, 'r', encoding='utf8'))
+    csv_file = csv.reader(open(filename, 'r', encoding='gbk',errors="ignore"))
     for line in csv_file:
         if (isfirst == 1):
             isfirst = 0
@@ -258,7 +264,7 @@ def add_question_judgement_info(data, filename):
     p_data = []
     m = 0
     isfirst = 1
-    csv_file = csv.reader(open(filename, 'r', encoding='utf8'))
+    csv_file = csv.reader(open(filename, 'r', encoding='gbk',errors="ignore"))
     for line in csv_file:
         if (isfirst == 1):
             isfirst = 0
@@ -349,7 +355,7 @@ def processTrainingData():
     industry_code_mapping = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8, 'I': 9, 'J': 10, 'K': 11,
                              'L': 12,'M': 13, 'N': 14, 'O': 15, 'P': 16, 'Q': 17, 'R': 18, 'S': 19, 'null': 20}
 
-    [data,label, m] = loadCSVfile('data/train/enterprise.csv','utf8')
+    [data,label, m] = loadCSVfile('data/train/enterprise.csv','gbk')
     per_line = ['tag1','tag2','tag3','tag4']
     label[0] += per_line
     col = 0
@@ -363,6 +369,8 @@ def processTrainingData():
         tag = tag.split("，")
         for j in range(0,len(tag)):
             if (tag[j] != ''):
+                # print('train')
+                # print(tag)
                 per_line[int(tag[j]) - 1] = 1
 
         # 增加企业的注册时间维度
@@ -388,28 +396,50 @@ def processTrainingData():
         # per_line[-1] = weight
 
         # 增加产品有无介绍 1 维度
-        per_line.append(0)
-        productDesc = data[i][6]
-        if productDesc!='':
-            per_line[-1] += 1
+        # per_line.append(0)
+        # productDesc = data[i][6]
+        # if productDesc!='':
+        #     per_line[-1] += 1
 
         # 增加 地区， 市区/县级/村级
         per_line.append(0)
         per_line.append(0)
         per_line.append(0)
         address = data[i][4]
-        if "村" in address:
+
+        if "村" in address and isExistsInArray(address,village_exceptions) == 0 and isExistsInArray(address,developedCities) == 0:
+            # print(address)
             per_line[-1] += 1
-        elif "县" in address:
+        elif "县" in address and isExistsInArray(address,village_exceptions) == 0 and isExistsInArray(address,developedCities) == 0:
             per_line[-2] += 1
         elif "市" in address:
             per_line[-3] += 1
+
+        # if "村" in address and isExistsInArray(address,village_exceptions) == 0:
+        #     print(address)
+        #     per_line[-1] += 1
+        # elif "县" in address:
+        #     per_line[-2] += 1
+        # elif "市" in address:
+        #     per_line[-3] += 1
+
 
         # 增加企业员工 1 维度
         # employees_num = data[i][8]
         # if employees_num == '':
         #     employees_num = 0
         # per_line.append(employees_num)
+
+        # 增加企业员工 2 维度
+        per_line.append(0)
+        per_line.append(0)
+        employees_num = data[i][8]
+        # print(employees_num)
+        if employees_num == '':
+            employees_num = 0
+        else:
+            per_line[-1] += np.float64(employees_num)
+            per_line[-2] += 1
 
         # 添加到每一行的数据项中
         data[i] += per_line
@@ -445,6 +475,12 @@ def processTrainingData():
     # 保存有用的信息
     saveCSVfile(data, "all.csv")
 
+def isExistsInArray(element,arr):
+    for i in range(0,len(arr)):
+        if arr[i] in element:
+            return 1
+    return 0
+
 def processPredictData():
 
     # 增加企业信息，及初始化
@@ -467,6 +503,8 @@ def processPredictData():
         tag = tag.split("，")
         for j in range(0, len(tag)):
             if (tag[j] != ''):
+                # print('test')
+                # print(tag)
                 per_line[int(tag[j]) - 1] = 1
 
         # 增加企业的注册时间 1 维度
@@ -492,28 +530,48 @@ def processPredictData():
         # per_line[-1] = weight
 
         # 增加产品有无介绍 1 维度
-        per_line.append(0)
-        productDesc = data[i][5]
-        if productDesc != '':
-            per_line[-1] += 1
+        # per_line.append(0)
+        # productDesc = data[i][5]
+        # if productDesc != '':
+        #     per_line[-1] += 1
+
+        # productDesc = data[i][5]
+        #
+        # for i in range(0,len(productKeywords)):
+        #     if productKeywords[i] in productDesc:
+        #         per_line.append(1)
+        #     else:
+        #         per_line.append(0)
 
         # 增加 地区， 市区/县级/村级
         per_line.append(0)
         per_line.append(0)
         per_line.append(0)
         address = data[i][3]
-        if "村" in address:
+        if "村" in address and isExistsInArray(address,village_exceptions) == 0 and isExistsInArray(address,developedCities) == 0:
+            # print(address)
             per_line[-1] += 1
-        elif "县" in address:
+        elif "县" in address and isExistsInArray(address,village_exceptions) == 0 and isExistsInArray(address,developedCities) == 0:
             per_line[-2] += 1
         elif "市" in address:
             per_line[-3] += 1
 
-        # 增加企业员工 1 维度
-        # employees_num = data[i][7]
-        # if employees_num == '':
-        #     employees_num = 0
-        # per_line.append(employees_num)
+        # if "村" in address and isExistsInArray(address,village_exceptions) == 0:
+        #     per_line[-1] += 1
+        # elif "县" in address:
+        #     per_line[-2] += 1
+        # elif "市" in address:
+        #     per_line[-3] += 1
+
+        # 增加企业员工 2 维度
+        per_line.append(0)
+        per_line.append(0)
+        employees_num = data[i][7]
+        if employees_num == '':
+            employees_num = 0
+        else:
+            per_line[-1] += np.float64(employees_num)
+            per_line[-2] += 1
 
         # 添加到每一行的数据项中
         data[i] += per_line
@@ -541,6 +599,8 @@ def processPredictData():
 
     print(indexes)
 
+    print(data[0])
+
     # 并将类型由str转换成float
     data = transform_data(m, indexes)
 
@@ -553,8 +613,32 @@ def processPredictData():
     serialize(enterprise_id_mapping, "id_mapping.binary")
 
 
+def getAllProducts():
+    [data, label, m] = loadCSVfile('data/train/enterprise.csv','gbk')
+    products = []
+
+    out = open('products.txt', 'w')
+    for i in range(0, m):
+        product = data[i][6]
+        products.append(product)
+        out.write(products[i] + '\n')
+
+def processProductKeywords():
+
+    f = open('keywords.txt', 'r',encoding='gbk')
+    keyword = f.readline()
+    while keyword != '':
+        keyword = keyword.split(' ')[0]
+        productKeywords.append(keyword)
+        keyword = f.readline()
+    f.close()
+    print(productKeywords)
 
 if __name__ == '__main__':
+
+    #getAllProducts()
+
+    #processProductKeywords()
 
     # 处理 training data 成 all.csv
     processTrainingData()

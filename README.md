@@ -1,6 +1,6 @@
-#ReadMe
+# ReadMe
 
-##File Overview
+## File Overview
 - / data
     -   / train       `进行训练的数据`
         - enterprise.csv
@@ -26,14 +26,15 @@
 - 先运行 `process.py` 文件，可以得到 `all.csv` `all_question.csv` `id_mapping.binary`
 - 后运行 `bpnn.py` 文件，可以得到 `answer.csv` 
 
-## Input Params `45`
+## Input Params `47`
 
-- Enterprise:   `29 PARAMS`
+- Enterprise:   `31 PARAMS`
     - Tag `4 params` 
     - Registered time   `1 param`
     - Industry code     `20 params`
     - Product           `1 param`
     - Address           `3 params`
+    - 企业员工            `2 params`
 - Partner:      `3 PARAMS`
     - 个人股东的数量  &nbsp;&nbsp;&nbsp;  `1`
     - 普通企业股东数量  `1`
@@ -43,7 +44,7 @@
 - Invest:       `4 PARAMS`
     - 历史的4类投资的数量 `4`
 - Judgement:    `6 PARAMS`
-    - 历史的6类判决的数量
+    - 历史的6类判决的数量    `6`
 
 ## Credit
 - `Data Ultimate 战队`

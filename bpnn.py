@@ -1,3 +1,4 @@
+#encoding=utf8
 import csv
 import tensorflow as tf
 import numpy as np
@@ -59,8 +60,8 @@ class BPNN(object):
         tf.add_to_collection('loss', tf.contrib.layers.l2_regularizer(self.lamada)(self.hidden_threshold))
         tf.add_to_collection('loss', tf.contrib.layers.l2_regularizer(self.lamada)(self.output_threshold))
         # 定义前向传播过程
-        self.hidden_cells = tf.sigmoid(tf.matmul(self.Train_Data,self.input_weights)+self.hidden_threshold)
-        self.output_cells = tf.sigmoid(tf.matmul(self.hidden_cells,self.hidden_weights)+self.output_threshold)
+        self.hidden_cells = tf.nn.sigmoid(tf.matmul(self.Train_Data, self.input_weights) + self.hidden_threshold)
+        self.output_cells = tf.nn.sigmoid(tf.matmul(self.hidden_cells, self.hidden_weights) + self.output_threshold)
         # 定义损失函数,并加入损失集合
         self.MSE = tf.reduce_mean(tf.square(self.output_cells-self.Train_Label))
         tf.add_to_collection('loss',self.MSE)
@@ -139,7 +140,7 @@ def run_main():
         Label.append(la)
 
     # 分割数据集,并对数据集进行标准化
-    Train_Data,Test_Data,Train_Label,Test_Label = train_test_split(Data,Label,test_size=1/8,random_state=10)
+    Train_Data,Test_Data,Train_Label,Test_Label = train_test_split(Data,Label,test_size=1/5,random_state=10)
     scaler = preprocessing.StandardScaler()
     Train_Data = scaler.fit_transform(Train_Data)
     Test_Data = scaler.fit_transform(Test_Data)
@@ -152,44 +153,48 @@ def run_main():
     lamada = 0.0001
     batch_size = 64
     learn_rate = 0.1
-    epoch = 30
+    epoch = 15
     iteration = 10000
 
     # 训练并测试网络
     bpnn = BPNN(input_n,hidden_n,output_n,lamada)
     train_loss,test_loss = bpnn.train_test(Train_Data,Train_Label,Test_Data,Test_Label,learn_rate,epoch,iteration, batch_size)
 
-
     # 看看训练的拟合正确率
-    predict_data = Data[:,:]
+    predict_data = Test_Data[:,:]
     predict_data = scaler.fit_transform(predict_data)
-    print("predict")
-    print(predict_data)
+
     result = bpnn.predict(predict_data)
     res = []
-    index = 0
-    w_count = 7846
-    count = 48171
-    result_count = 0.0
-    print(predict_data[1])
+    right_count = 0
+    count = len(Test_Label)
+    win_lable_count = 0
+    for i in range(0,count):
+        if (np.float64(Test_Label[i][0]) == 1.0):
+            win_lable_count += 1
+        # else:
+        #     print(Test_Label[i])
+        result[i][0] = (result[i][0] > 0.5)
+        res.append(result[i][0])
+        if np.float64(Test_Label[i][0]) == result[i][0]:
+            right_count += 1
 
-    for i in result:
-        if i < 0.5:
-            per = 0
-        else:
-            per = 1
-        res.append(per)
-        if index < w_count and per == 1:
-            result_count += 1
-        elif index >= w_count and per == 0:
-            result_count += 1
-        index += 1
+    # print(result[0][0])
 
-    print('res')
-    print(res)
+    #print(Test_Data)
+    #print(Test_Label)
+    print('label')
+    print(win_lable_count)
+    print(count - win_lable_count)
+    print("predict")
+    print(len(predict_data))
+    # print(predict_data)
+    #print(Test_Label)
+    #print('res')
+    #print(res)
     # 正确率
     print('result')
-    print(result_count/count)
+    print(right_count/count)
 
 
     # 结果可视化
